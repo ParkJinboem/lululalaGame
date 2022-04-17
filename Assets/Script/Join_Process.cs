@@ -18,7 +18,6 @@ public class Join_Process : MonoBehaviour
     public GameObject search_PassPanel;
     public GameObject gameStartPanel;
     public GameObject terOfSerPanel;
-    public GameObject terOfSer_Xbox;
 
     public GameObject[] searchID;
     public GameObject[] searchpass;
@@ -32,6 +31,7 @@ public class Join_Process : MonoBehaviour
     public GameObject loginIn_Xbox;
     public GameObject SearchID_Xbox;
     public GameObject SearchPass_Xbox;
+    public GameObject terOfSer_Xbox;
     private void Awake()
     {
         
@@ -41,7 +41,15 @@ public class Join_Process : MonoBehaviour
     {
         signInPanel.SetActive(true);
         loginInPanel.SetActive(false);
+        terOfSerPanel.SetActive(false);
     }
+    public void TerOfSer_On()
+    {
+        terOfSerPanel.SetActive(true);
+        loginInPanel.SetActive(false);
+
+    }
+
     public void LoginIN_On()
     {
         loginInPanel.SetActive(true);
@@ -125,10 +133,7 @@ public class Join_Process : MonoBehaviour
         SceneManager.LoadScene(3);
     }
 
-    public void TerOfSer_On()
-    {
-        terOfSerPanel.SetActive(true);
-    }
+ 
 
     public void TerOfSer_Xbox()
     {
