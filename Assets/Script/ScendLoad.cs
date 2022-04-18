@@ -13,10 +13,6 @@ public class ScendLoad : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(Input.GetKeyDown(KeyCode.Space))
-        {
-            Debug.Log("스페이스");
-            AppCheck.LoadScene("01LoadingScene");
-        }
+       
     }
 }

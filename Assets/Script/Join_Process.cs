@@ -126,11 +126,11 @@ public class Join_Process : MonoBehaviour
     }
     public void GoLoading()
     {
-        SceneManager.LoadScene(1);
+        SceneManager.LoadScene("01LoadingScene");
     }
     public void GoGame()
     {
-        SceneManager.LoadScene(3);
+        SceneManager.LoadScene("03MainScene");
     }
 
  

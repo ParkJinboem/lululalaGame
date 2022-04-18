@@ -11,83 +11,76 @@ using UnityEngine.SceneManagement;
 public class AppCheck : MonoBehaviour
 {
     //서버 주소 및 데이터객체 생성
-    public string appCheckURL = "Http://192.168.219.147:8077/Load_AppCheck";
-    public string serviceCheckURL = "Http://192.168.219.147:8077/Load_ServiceCheck";
+    public static string appCheckURL = "Http://192.168.219.147:8077/Load_AppCheck";
+    public static string serviceCheckURL = "Http://192.168.219.147:8077/Load_ServiceCheck";
 
-    Load_AppCheck load_AppData = new Load_AppCheck();
-    Load_ServiceCheck load_ServiceData = new Load_ServiceCheck();
+    static Load_AppCheck load_AppData = new Load_AppCheck();
+    static Load_ServiceCheck load_ServiceData = new Load_ServiceCheck();
 
     //로딩 이미지
     [SerializeField]
     Image loadingImageBar;
-
     public Image[] loadingText_10;
     public Image[] loadingText_1;
     public Image loadingTextPercent;
 
-    
-
     //public Text versionText;
     //public Text serviceText;
-
-    //로딩씬
-    static string nextScene;
-
-    public static void LoadScene(string SceneName)
-    {
-        nextScene = SceneName;
-        SceneManager.LoadScene("01LoadingScene");
-    }
 
     // Start is called before the first frame update
     void Start()
     {
-        StartCoroutine(GotoIntro());
         //GetServerData();
-
         //AppCheckSucces();
         //ServiceCheck();
-
         for (int i = 0; i < 10; i++)
         {
             loadingText_10[i].enabled = false;
             loadingText_1[i].enabled = false;
         }
-
         StartCoroutine(LoadSceneProcess());
     }
-    IEnumerator LoadSceneProcess()
+    IEnumerator LoadSceneProcess()  //비동기식 로딩
     {
-        AsyncOperation op =  SceneManager.LoadSceneAsync(nextScene);
-        op.allowSceneActivation = false;    //씬을 90프로까지만 로딩하고 대기(페이크로딩을 구현)
+        yield return null;
+        AsyncOperation opration = SceneManager.LoadSceneAsync("02IntroScene");
+        //opration.isDone  ==> 작업완료의 유무를 boolean형으로 반환
+        //opration.progress ==> 진행정도를 float형 0 ,1 을 반홤(0-진행중 1-진행완료)
+        //opration.allowSceneActivation ==> 로딩이 완료되면 신을 넘기고 false면 progress가 0.9f서 멈춤, true면 불러온 씬으로넘김
+        opration.allowSceneActivation = false;
 
         float timer = 0f;
-        while(!op.isDone)   //씬로딩이 끝나지 않으면 계속해서 반복
+        while (!opration.isDone)
         {
-            Debug.Log("isDone");
             yield return null;
 
-            if(op.progress < 0.9f)  //씬의 진행도가 90프로보다 작으면
+            if (loadingImageBar.fillAmount < 0.9f)
             {
-                Debug.Log(op.progress);
-                loadingImageBar.fillAmount = op.progress;
-            }
-            else //페이커 로딩 구현
-            {
-                Debug.Log("fakeloading");
-                timer += Time.unscaledDeltaTime;
-                loadingImageBar.fillAmount = Mathf.Lerp(0.9f, 1f, timer);   //나머지10퍼세트를 1초에 걸쳐서 채움
-                if(loadingImageBar.fillAmount>=1.0f)
+                loadingImageBar.fillAmount = opration.progress;
+
+                for (int i = 0; i < 10; i++)
                 {
-                    op.allowSceneActivation = true;     //씬을 불러옴
+                    loadingText_1[i].enabled = true;
+                    loadingText_10[0].enabled = true;
+                }
+            }
+            else if (opration.progress >= 0.9f)
+            {
+                timer += Time.unscaledDeltaTime;
+                loadingImageBar.fillAmount = Mathf.Lerp(0.9f, 1f, timer);
+
+                if (loadingImageBar.fillAmount >= 1.0f && opration.progress >= 0.9f)
+                {
+                    opration.allowSceneActivation = true;
                     yield break;
                 }
             }
+
         }
     }
 
     //public void AppCheckSucces()
-    public Load_AppCheck AppCheckSucces()
+    public static Load_AppCheck AppCheckSucces()
     {
         //JsonUtility사용 string, bytep[]로 변환
         string str = JsonUtility.ToJson(load_AppData);
@@ -123,7 +116,7 @@ public class AppCheck : MonoBehaviour
         return load_AppData;
     }
     //public void ServiceCheck()
-    public Load_ServiceCheck ServiceCheck()
+    public static Load_ServiceCheck ServiceCheck()
     {
         //JsonUtility사용 string, bytep[]로 변환
         string str = JsonUtility.ToJson(load_ServiceData);
@@ -160,16 +153,6 @@ public class AppCheck : MonoBehaviour
         return load_ServiceData;
     }
 
-  
-
-    IEnumerator GotoIntro()
-    {
-        yield return new WaitForSeconds(3.0f);
-        SceneManager.LoadScene(2);
-    }
-
-
-
     //ServerData GetServerData()
     //{
     //    ServerData data = new ServerData();
@@ -202,6 +185,4 @@ public class AppCheck : MonoBehaviour
     //    Debug.Log(info.result);
     //    return info;
     //}
-
-
 };
