@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b80e3433bbe6a9478a52ae79a694155, type: 3}
+  m_Name: BlockConfig
+  m_EditorClassIdentifier: 
+  dropSpeed:
+  - 0.2
+  - 0.3
+  - 0.35
+  - 0.4
+  - 0.425
+  - 0.45
+  - 0.475
+  - 0.5
+  - 0.525
+  basicBlockSprites:
+  - {fileID: 21300000, guid: 2da698954418efd43ad7f4aeb5243d7e, type: 3}
+  - {fileID: 21300000, guid: 2486d5771d0e5194a84cd8a45b0398fb, type: 3}
+  - {fileID: 21300000, guid: 3e5669f3c51e9994ca35b24b83f04d42, type: 3}
+  explosion: {fileID: 4905169246850174971, guid: 7f934b3ce06e0ba40bd3649e6d1ca8de, type: 3}
+  blockColors:
+  - {r: 0.98823535, g: 0.78823537, b: 0.19607845, a: 1}
+  - {r: 0.16078432, g: 0.67058825, b: 0.9921569, a: 0}
+  - {r: 0.9607844, g: 0.3529412, b: 0.14509805, a: 0}
