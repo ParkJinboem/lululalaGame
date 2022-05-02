@@ -47,8 +47,7 @@ namespace Lulu.Board
         //증복블럭 셔플
         public Transform blockObj { get { return m_BlockBehaviour?.transform; } }   //Block에 연결된 GameObject의 Transform을 구함
 
-        Vector2Int m_vtDuplicate;   //블럭 중복 개수, Shuffle시에 중복검사에 사용.
-
+        Vector2Int m_vtDuplicate;   //블럭 중복 개수, Shuffle시에 중복검사에 사용
         public int horzDuplicate    //가로방향 중복 검사시 사용
         {
             get { return m_vtDuplicate.x; }
@@ -85,7 +84,7 @@ namespace Lulu.Board
                 m_BlockActionBehaviour?.MoveDrop(value);
             }
         }
-    
+
         public Block(BlockType blokcType)
         {
             m_BlockType = blokcType;
@@ -98,7 +97,7 @@ namespace Lulu.Board
             m_nDurability = 1;
         }
 
-        internal Block InstantateBlockObj(GameObject blockPrefab, Transform containerObj)
+        internal Block InstantiateBlockObj(GameObject blockPrefab, Transform containerObj)
         {
             //유효하지 않은 블럭인 경우 Block GameObject를 생성하지 않는다.
             if (IsValidate() == false)
@@ -258,7 +257,6 @@ namespace Lulu.Board
 
             return true;
         }
-
-      
     }
 }
+

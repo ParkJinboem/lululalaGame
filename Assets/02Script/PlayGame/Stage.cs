@@ -4,6 +4,7 @@ using UnityEngine;
 using Lulu.Board;
 using Lulu.Util;
 using Lulu.Core;
+using System;
 
 namespace Lulu.Stage
 {
@@ -28,67 +29,11 @@ namespace Lulu.Stage
             m_Board = new Lulu.Board.Board(nRow, nCol);
         }
 
-
         internal void ComposeStage(GameObject cellPrefab, GameObject blockPrefab, Transform container)
         {
-            m_Board.ComposeStage(cellPrefab, blockPrefab, container);
+            m_Board.ComposeStage(cellPrefab, blockPrefab, container, m_StageBuilder);
         }
-
-        #region Simple Methods
-        //----------------------------------------------------------------------
-        // 조회(get/set/is) 메소드
-        //----------------------------------------------------------------------
-
-        /*
-         * 보드안에서 발생한 이벤트인지 체크한다       
-         */
-        public bool IsInsideBoard(Vector2 ptOrg)
-        {
-            // 계산의 편의를 위해서 (0, 0)을 기준으로 좌표를 이동한다. 
-            // 8 x 8 보드인 경우: x(-4 ~ +4), y(-4 ~ +4) -> x(0 ~ +8), y(0 ~ +8) 
-            Vector2 point = new Vector2(ptOrg.x + (maxCol / 2.0f), ptOrg.y + (maxRow / 2.0f));
-
-            if (point.y < 0 || point.x < 0 || point.y > maxRow || point.x > maxCol)
-                return false;
-
-            return true;
-        }
-
-        /*
-         * 유효한 블럭(이동가능한 블럭) 위에서 있는지 체크한다.
-         * @param point Wordl 좌표, 컨테이너 기준
-         * @param blockPos out 파라미터, 보드에 저장된 블럭의 인덱스
-         * 
-         * @return 스와이프 가능하면 true
-         */
-        public bool IsOnValideBlock(Vector2 point, out BlockPos blockPos)
-        {
-            //1. World 좌표 -> 보드의 블럭 인덱스로 변환한다.
-            Vector2 pos = new Vector2(point.x + (maxCol / 2.0f), point.y + (maxRow / 2.0f));
-            int nRow = (int)pos.y;
-            int nCol = (int)pos.x;
-
-            //리턴할 블럭 인덱스 생성
-            blockPos = new BlockPos(nRow, nCol);
-
-            //2. 스와이프 가능한지 체크한다.
-            return board.IsSwipeable(nRow, nCol);
-        }
-
-        public bool IsValideSwipe(int nRow, int nCol, Swipe swipeDir)
-        {
-            switch (swipeDir)
-            {
-                case Swipe.DOWN: return nRow > 0; ;
-                case Swipe.UP: return nRow < maxRow - 1;
-                case Swipe.LEFT: return nCol > 0;
-                case Swipe.RIGHT: return nCol < maxCol - 1;
-                default: return false;
-            }            
-        }
-
-        #endregion 
-
+      
         public IEnumerator CoDoSwipeAction(int nRow, int nCol, Swipe swipeDir, Returnable<bool> actionResult)
         {
             actionResult.value = false; //코루틴 리턴값 RESET
@@ -149,8 +94,12 @@ namespace Lulu.Stage
             //1. 제거된 블럭에 따라 블럭 재배치(상위 -> 하위 이동/애니메이션)
             yield return m_Board.ArrangeBlocksAfterClean(unfilledBlocks, movingBlocks); //Board객체에 빈 블럭을 채우도록 요청
 
-            //2. 유저에게 생성된 블럭이 잠시동안 보이도록 다른 블럭이 드롭되는 동안 대기한다.
-            yield return WaitForDropping(movingBlocks); //모든 블럭의 드롭이 완료될 때까지 대기한다.
+            //2. 재배치 완료(이동 애니메이션 완료)후, 비어있는 블럭 다시 생성
+            yield return m_Board.SpawnBlocksAfterClean(movingBlocks);
+
+            //3. 블럭 재생성 후, 매치블럭 제거하기 위한 루프를 돌때
+            //   유저에게 생성된 블럭이 잠시동안 보이도록 다른 블럭이 드롭되는 동안 대기한다.
+            yield return WaitForDropping(movingBlocks);
         }
 
         //리스트에 포함된 블럭의 애니메이션이 끝날때 까지 기다린다.
@@ -182,7 +131,60 @@ namespace Lulu.Stage
             yield break;
         }
 
+        #region Simple Methods
+        //----------------------------------------------------------------------
+        // 조회(get/set/is) 메소드
+        //----------------------------------------------------------------------
 
+        /*
+       * 보드안에서 발생한 이벤트인지 체크한다       
+       */
+        public bool IsInsideBoard(Vector2 ptOrg)
+        {
+            // 계산의 편의를 위해서 (0, 0)을 기준으로 좌표를 이동한다. 
+            // 8 x 8 보드인 경우: x(-4 ~ +4), y(-4 ~ +4) -> x(0 ~ +8), y(0 ~ +8) 
+            Vector2 point = new Vector2(ptOrg.x + (maxCol / 2.0f), ptOrg.y + (maxRow / 2.0f));
+
+            if (point.y < 0 || point.x < 0 || point.y > maxRow || point.x > maxCol)
+                return false;
+
+            return true;
+        }
+
+        /*
+      * 유효한 블럭(이동가능한 블럭) 위에서 있는지 체크한다.
+      * @param point Wordl 좌표, 컨테이너 기준
+      * @param blockPos out 파라미터, 보드에 저장된 블럭의 인덱스
+      * 
+      * @return 스와이프 가능하면 true
+      */
+        public bool IsOnValideBlock(Vector2 point, out BlockPos blockPos)
+        {
+            //1. World 좌표 -> 보드의 블럭 인덱스로 변환한다.
+            Vector2 pos = new Vector2(point.x + (maxCol / 2.0f), point.y + (maxRow / 2.0f));
+            int nRow = (int)pos.y;
+            int nCol = (int)pos.x;
+
+            //리턴할 블럭 인덱스 생성
+            blockPos = new BlockPos(nRow, nCol);
+
+            //2. 스와이프 가능한지 체크한다.
+            return board.IsSwipeable(nRow, nCol);
+        }
+
+        public bool IsValideSwipe(int nRow, int nCol, Swipe swipeDir)
+        {
+            switch (swipeDir)
+            {
+                case Swipe.DOWN: return nRow > 0; ;
+                case Swipe.UP: return nRow < maxRow - 1;
+                case Swipe.LEFT: return nCol > 0;
+                case Swipe.RIGHT: return nCol < maxCol - 1;
+                default: return false;
+            }
+        }
+
+        #endregion
 
         public void PrintAll()
         {

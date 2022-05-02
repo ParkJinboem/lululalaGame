@@ -2,8 +2,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Lulu.Util;
 using Lulu.Quest;
+using Lulu.Util;
+using Lulu.Stage;
 
 
 namespace Lulu.Board
@@ -30,6 +31,7 @@ namespace Lulu.Board
         Transform m_Container;
         GameObject m_CellPrefab;
         GameObject m_BlockPrefab;
+        StageBuilder m_StageBuilder;
 
         BoardEnumerator m_Enumerator;
         //생성자, 보드크기 정보를 저장하고 보드 크기만큼 저장할 수 있는 Cell과 Block 배열을 생성
@@ -46,12 +48,13 @@ namespace Lulu.Board
 
 
 
-        internal void ComposeStage(GameObject cellPrefab, GameObject blockPrefab, Transform container)
+        internal void ComposeStage(GameObject cellPrefab, GameObject blockPrefab, Transform container, StageBuilder stageBuilder)
         {
             //1. 스테이지 구성에 필요한 Cell, Block, Container(Board) 정보를 저장한다.
             m_CellPrefab = cellPrefab;
             m_BlockPrefab = blockPrefab;
             m_Container = container;
+            m_StageBuilder = stageBuilder;
 
             //2. 3매치된 블록이 없도록 섞는다.
             BoardShuffler shuffler = new BoardShuffler(this, true); //BoardShuffler 객체를 생성, 멤버로 저장되지않기 때문에 Shuffle을 수행하고 삭제됨
@@ -69,7 +72,7 @@ namespace Lulu.Board
                     cell?.Move(initX + nCol, initY + nRow);
 
                     //3.2 Block GameObject 생성을 요청한다.
-                    Block block = m_Blocks[nRow, nCol]?.InstantateBlockObj(blockPrefab, container);
+                    Block block = m_Blocks[nRow, nCol]?.InstantiateBlockObj(blockPrefab, container);
                     block?.Move(initX + nCol, initY + nRow);
                     //엘비스연산자 '?' : ?의 왼쪽 객체가 null이면 null을 리턴
                 }
@@ -318,14 +321,63 @@ namespace Lulu.Board
             yield break;
         }
 
-        //지정된 위치에 블럭이 새로 할당될수 있는지 체크하는 함수
-        bool CanBlockBeAllocatable(int nRow, int nCol)
+        //비어있는 블럭을 다시 생성해서 전체 보드를 다시 구성한다.
+        public IEnumerator SpawnBlocksAfterClean(List<Block> movingBlocks)
         {
-            if (!m_Cells[nRow, nCol].type.IsBlockAllocatableType())
-                return false;
+            for (int nCol = 0; nCol < m_nCol; nCol++)   //보드 전체를 탐색해서 처리
+            {
+                for (int nRow = 0; nRow < m_nRow; nRow++)
+                {
+                    //비어있는 블럭이 있는 경우, 상위 열은 모두 비어있거나, 장애물로 인해서 남아있음.
+                    if (m_Blocks[nRow, nCol] == null)   //보드에서 해당 위치에 블럭이 비어있는 경우에만 처리
+                    {
+                        int nTopRow = nRow;
+                        int nSpawnBaseY = 0;    //블럭이 생성되는 원점
 
-            return m_Blocks[nRow, nCol] == null;
+                        for (int y = nTopRow; y < m_nRow; y++)  //현재 행(row)위쪽에 빈블럭을 모두 찾아서 블럭을 생성
+                        {
+                            if (m_Blocks[y, nCol] != null || !CanBlockBeAllocatable(y, nCol))
+                                continue;
+
+                            Block block = SpawnBlockWithDrop(y, nCol, nSpawnBaseY, nCol);   //블럭생성을 요청
+                            if (block != null)
+                                movingBlocks.Add(block);    //생성된블럭이 드롭 액션을 수행하기 때문에 movingBlocks 리스트에 저장
+
+                            nSpawnBaseY++;  //블럭이 생성되는 기준 위치를 '1'증가
+                        }
+
+                        break;
+                    }
+                }
+            }
+
+            yield return null;
         }
+
+        /*
+     * 블럭을 생성하고 목적지(nRow, nCol) 까지 드롭한다
+     * @param nRow, nCol : 생성후 보드에 저장되는 위치
+     * @param nSpawnedRow, nSpawnedCol : 화면에 생성되는 위치, nRow, nCol 위치까지 드롭 액션이 연출된다
+     */
+        Block SpawnBlockWithDrop(int nRow, int nCol, int nSpawnedRow, int nSpawnedCol)
+        {
+            float fInitX = CalcInitX(Core.Constants.BLOCK_ORG);             //블럭이 Spawn되는 col 기준 원점
+            float fInitY = CalcInitY(Core.Constants.BLOCK_ORG) + m_nRow;    //블럭이 Spawn되는 row 기준 원점
+
+
+            //SpawnBlock()으로 Block 객체가 생성되고, InstantiateBlockObj()메소드를 호출해서
+            //Block GameObject를 생성한다.
+            Block block = m_StageBuilder.SpawnBlock().InstantiateBlockObj(m_BlockPrefab, m_Container);
+            if (block != null)
+            {
+                m_Blocks[nRow, nCol] = block;   //새로 생성된 브럭을 보드의 지정된 위치에 배치
+                block.Move(fInitX + (float)nSpawnedCol, fInitY + (float)(nSpawnedRow)); //블럭이 생성되면 드롭 시작 위치로 이동시킴
+                block.dropDistance = new Vector2(nSpawnedCol - nCol, m_nRow + (nSpawnedRow - nRow));    //떨어지는 거리를 설정한다.
+            }
+
+            return block;
+        }
+
 
         //퍼즐의 시작 X 위치를 구한다. left - top 좌표
         public float CalcInitX(float offset = 0)
@@ -372,6 +424,15 @@ namespace Lulu.Board
         public bool IsSwipeable(int nRow, int nCol)
         {
             return m_Cells[nRow, nCol].type.IsBlockMovableType();
+        }
+
+        //지정된 위치에 블럭이 새로 할당될수 있는지 체크하는 함수
+        bool CanBlockBeAllocatable(int nRow, int nCol)
+        {
+            if (!m_Cells[nRow, nCol].type.IsBlockAllocatableType())
+                return false;
+
+            return m_Blocks[nRow, nCol] == null;
         }
     }
 }
