@@ -10,12 +10,14 @@ namespace Lulu.Stage
 {
     public class Stage
     {
+
+        //스테이지를 플레이할 게임판을 저장할 멤버를 선언
+        Lulu.Board.Board m_Board;
         //플레이할 게임판의 크기를 저장할 멤버와 속성을 선언
         public int maxRow { get { return m_Board.maxRow; } }
         public int maxCol { get { return m_Board.maxCol; } }
 
-        //스테이지를 플레이할 게임판을 저장할 멤버를 선언
-        Lulu.Board.Board m_Board;
+        
         public Lulu.Board.Board board { get { return m_Board; } }
 
         StageBuilder m_StageBuilder;
