@@ -21,7 +21,8 @@ namespace Lulu.Util
         public bool isTouchDown => m_InputHandler.isInputDown;
         public bool isTouchUp => m_InputHandler.isInputUp;
         public Vector2 touchPosition => m_InputHandler.inputPosition;
-        public Vector2 touch2BoardPosition => TouchToPosition(m_InputHandler.inputPosition);    //Board의 원점을 기준으로 변환된 Local
+        public Vector2 touch2BoardPosition => TouchToPosition(m_InputHandler.inputPosition);    
+        //Board의 원점을 기준으로 변환된 Local
 
         //Screen 좌표의 씬의 Board 기준 Local 좌표를 리턴한다.
         Vector2 TouchToPosition(Vector3 vtInput) //vtInput: Screen 좌표 즉, 픽셀 좌표

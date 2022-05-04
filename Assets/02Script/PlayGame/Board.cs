@@ -34,8 +34,8 @@ namespace Lulu.Board
         StageBuilder m_StageBuilder;
 
         BoardEnumerator m_Enumerator;
-        //생성자, 보드크기 정보를 저장하고 보드 크기만큼 저장할 수 있는 Cell과 Block 배열을 생성
-        public Board(int nRow, int nCol)
+       
+        public Board(int nRow, int nCol)     //생성자, 보드크기 정보를 저장하고 보드 크기만큼 저장할 수 있는 Cell과 Block 배열을 생성
         {
             m_nRow = nRow;
             m_nCol = nCol;
@@ -62,20 +62,38 @@ namespace Lulu.Board
 
 
             //3. Cell, Block Prefab을 이용해서 Board에 Cell/Block GameObject를 추가한다.
-            float initX = CalcInitX(0.5f);
-            float initY = CalcInitY(0.5f);
+            float initX = CalcInitX(0.5f);  //row = 0, col = 0에 해당되는 화면 positino을 구한다.
+            float initY = CalcInitY(-4.2f);
+            Debug.Log(initX);
+            Debug.Log(initY);
+
             for (int nRow = 0; nRow < m_nRow; nRow++)
                 for (int nCol = 0; nCol < m_nCol; nCol++)
                 {
                     //3.1 Cell GameObject 생성을 요청한다. GameObject가 생성되지 않는 경우에는 null을 리턴
                     Cell cell = m_Cells[nRow, nCol]?.InstantiateCellObj(cellPrefab, container);
-                    cell?.Move(initX + nCol, initY + nRow);
+                    cell?.Move((initX + nCol), (initY + nRow) );
 
                     //3.2 Block GameObject 생성을 요청한다.
                     Block block = m_Blocks[nRow, nCol]?.InstantiateBlockObj(blockPrefab, container);
                     block?.Move(initX + nCol, initY + nRow);
                     //엘비스연산자 '?' : ?의 왼쪽 객체가 null이면 null을 리턴
                 }
+        }
+
+
+        //퍼즐의 시작 X 위치를 구한다. left - top 좌표
+        public float CalcInitX(float offset = 0)
+        {
+            Debug.Log(-m_nCol / 2.0f + offset);
+            return -m_nCol / 2.0f + offset;
+        }
+        //퍼즐의 시작 Y 위치, left - bottom 좌표
+        //하단이 (0,0) 이므로
+        public float CalcInitY(float offset = 0)
+        {
+            Debug.Log(-m_nRow / 2.0f + offset);
+            return -m_nRow / 2.0f + offset;
         }
 
         public IEnumerator Evaluate(Returnable<bool> matchResult)   //매칭된 블럭이 제거된다.
@@ -362,7 +380,7 @@ namespace Lulu.Board
         Block SpawnBlockWithDrop(int nRow, int nCol, int nSpawnedRow, int nSpawnedCol)
         {
             float fInitX = CalcInitX(Core.Constants.BLOCK_ORG);             //블럭이 Spawn되는 col 기준 원점
-            float fInitY = CalcInitY(Core.Constants.BLOCK_ORG) + m_nRow;    //블럭이 Spawn되는 row 기준 원점
+            float fInitY = CalcInitY(Core.Constants.BLOCK_ORG) + m_nRow - 4.7f;    //블럭이 Spawn되는 row 기준 원점
 
 
             //SpawnBlock()으로 Block 객체가 생성되고, InstantiateBlockObj()메소드를 호출해서
@@ -379,17 +397,6 @@ namespace Lulu.Board
         }
 
 
-        //퍼즐의 시작 X 위치를 구한다. left - top 좌표
-        public float CalcInitX(float offset = 0)
-        {
-            return -m_nCol / 2.0f + offset;
-        }
-        //퍼즐의 시작 Y 위치, left - bottom 좌표
-        //하단이 (0,0) 이므로
-        public float CalcInitY(float offset = 0)
-        {
-            return -m_nRow / 2.0f + offset;
-        }
 
         //주어진 위치의 블럭이 셔플 가능한지 즉, 셔플 대상인지 검사하는 메소드
         public bool CanShuffle(int nRow, int nCol, bool bLoading)   //bLoading: 메소드가 호출되는 단계를 나타낸다.

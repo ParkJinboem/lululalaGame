@@ -16,6 +16,14 @@ namespace Lulu.Stage
             m_nStage = nStage;
         }
 
+        public static Stage BuildStage(int nStage)    //빌드 스테이지 설정
+        {
+            StageBuilder stageBuilder = new StageBuilder(nStage);
+            Stage stage = stageBuilder.ComposeStage();
+
+            return stage;
+        }
+
         public Stage ComposeStage()
         {
             Debug.Assert(m_nStage > 0, $"Invalide Stage : {m_nStage}"); //스테이지 번호가 유효한지 검사
@@ -58,6 +66,7 @@ namespace Lulu.Stage
         }
         Cell SpawnCellForStage(int nRow, int nCol)
         {
+            //Debug.Assert() ==> 조건을 확인함, 조건이 false이면 메시지를 출력
             Debug.Assert(m_StageInfo != null);
             Debug.Assert(nRow < m_StageInfo.row && nCol < m_StageInfo.col);
 
@@ -74,12 +83,6 @@ namespace Lulu.Stage
             return newBlock;
         }
 
-        public static Stage BuildStage(int nStage)    //빌드 스테이지 설정
-        {
-            StageBuilder stageBuilder = new StageBuilder(nStage);
-            Stage stage = stageBuilder.ComposeStage();
-
-            return stage;
-        }
+       
     }
 }

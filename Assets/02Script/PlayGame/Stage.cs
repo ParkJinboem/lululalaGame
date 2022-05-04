@@ -145,9 +145,10 @@ namespace Lulu.Stage
         {
             // 계산의 편의를 위해서 (0, 0)을 기준으로 좌표를 이동한다. 
             // 8 x 8 보드인 경우: x(-4 ~ +4), y(-4 ~ +4) -> x(0 ~ +8), y(0 ~ +8) 
-            Vector2 point = new Vector2(ptOrg.x + (maxCol / 2.0f), ptOrg.y + (maxRow / 2.0f));
-
+            Vector2 point = new Vector2(ptOrg.x + (maxCol / 2.0f) , ptOrg.y + (maxRow / 2.0f));
+            Debug.Log("point " + point);
             if (point.y < 0 || point.x < 0 || point.y > maxRow || point.x > maxCol)
+
                 return false;
 
             return true;

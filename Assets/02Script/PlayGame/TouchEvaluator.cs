@@ -63,10 +63,10 @@ namespace Lulu.Util
             return Swipe.NA;    //Swipe enum 타입을 리턴
         }
 
+
         //두 포인트 사이의 각도를 구한다.
         //Input(마우스, 터치) 장치 드래그한 각도를 구하는데 활용한다.
         //return: 두 포인트 사이의 각도
-
         static float EvalDragAngle(Vector2 vtStart, Vector2 vtEnd)
         {
             Vector2 dragDirection = vtEnd - vtStart;

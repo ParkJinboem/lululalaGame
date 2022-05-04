@@ -69,7 +69,11 @@ namespace Lulu.Stage
 
                 //1.2 Play 영역(보드)에서 클릭하지 않는 경우는 무시
                 if (!m_Stage.IsInsideBoard(point))
+                {
+                    Debug.Log("보드영억을 벗어남");
                     return;
+                }
+                    
                 //1.3 클릭한 위치의 블럭을 구한다.
                 BlockPos blockPos;
                 if(m_Stage.IsOnValideBlock(point, out blockPos))
@@ -78,7 +82,7 @@ namespace Lulu.Stage
                     m_bTouchDown = true;    //클릭 상태 플래그 ON
                     m_BlockDownPos = blockPos;  //클릭한 블럭의 위치(row, col)저장
                     m_ClickPos = point;         //클릭한 Local 좌표 저장
-                   // Debug.Log($"Mouse Down In Board : {blockPos})");
+                    //Debug.Log($"Mouse Down In Board : {blockPos})");
                 }
             }
             //2. Touch Up: 유효한 블럭 위에서 Down 후에만 Up 이벤트처리
