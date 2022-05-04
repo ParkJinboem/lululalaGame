@@ -65,7 +65,7 @@ namespace Lulu.Stage
             {
                 //1.1 보드 기준 Local 좌표를 구한다.
                 Vector2 point = m_InputManager.touch2BoardPosition;
-                //Debug.Log($"Input Down= {point}, local = {m_InputManager.touch2BoardPosition}");
+                Debug.Log($"Input Down= {point}, local = {m_InputManager.touch2BoardPosition}");
 
                 //1.2 Play 영역(보드)에서 클릭하지 않는 경우는 무시
                 if (!m_Stage.IsInsideBoard(point))
