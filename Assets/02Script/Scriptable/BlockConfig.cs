@@ -10,8 +10,12 @@ namespace Lulu.Scriptable
     {
         public float[] dropSpeed;
         public Sprite[] basicBlockSprites;
-        public GameObject explosion;
+        public GameObject explosion;    //블럭이 제거될 때 사용할 파티클 Prefab을 저장하는 GameObject
+        
+
         public Color[] blockColors;
+
+   
 
         public GameObject GetExplosionObject(BlockQuestType questType)
         {
@@ -26,7 +30,7 @@ namespace Lulu.Scriptable
 
         public Color GetBlockColor(BlockBreed breed)
         {
-            return blockColors[(int)breed];
+            return blockColors[(int)breed];    
         }
     }
 }

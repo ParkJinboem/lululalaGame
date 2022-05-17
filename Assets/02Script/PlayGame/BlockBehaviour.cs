@@ -16,6 +16,7 @@ namespace Lulu.Board
         {
             m_spriteRenderer = GetComponent<SpriteRenderer>();
             UpdateView(false);
+            
         }
 
         internal void SetBlock(Block block)
@@ -44,16 +45,19 @@ namespace Lulu.Board
         IEnumerator CoStartSimpleExplosion(bool bDestroy = true)
         {
             //0. 크기가 줄어드는 액션 실행한다 : 폭파되면서 자연스럽게 소멸되는 모양 연출, 1 -> 0.3으로 줄어듬
-            yield return Util.Action2D.Scale(transform, Core.Constants.BLOCK_DESTROY_SCALE, 4f);
+            yield return Util.Action2D.Scale(transform, Core.Constants.BLOCK_DESTROY_SCALE, 2.0f);
+
+            //0. 객체가 좌우로 흔들거린후 폭발
+            //yield return Util.Action2D.Shake(transform, 0.03f, 2.0f, 0);    //Shake(위치, 거리, 속도, 흔들횟수)
+
             //1. 폭발시키는 효과 연출 : 블럭 자체의 Clear 효과를 연출한다. (모든블럭 동일)
             GameObject explosionObj = m_BlockConfig.GetExplosionObject(BlockQuestType.CLEAR_SIMPLE);
-            ParticleSystem.MainModule newModuele = explosionObj.GetComponent<ParticleSystem>().main;
+            ParticleSystem.MainModule newModuele = explosionObj.transform.GetChild(1).GetComponent<ParticleSystem>().main;
             newModuele.startColor = m_BlockConfig.GetBlockColor(m_Block.breed);
-
             explosionObj.SetActive(true);
             explosionObj.transform.position = this.transform.position;
 
-            yield return new WaitForSeconds(0.1f);
+            yield return new WaitForSeconds(0.1f);  //작아진 블럭이 사라지는 시간
 
             //2. 블럭 GameObject 객체 삭제
             if (bDestroy)

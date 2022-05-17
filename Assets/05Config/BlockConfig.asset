@@ -26,8 +26,8 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 2da698954418efd43ad7f4aeb5243d7e, type: 3}
   - {fileID: 21300000, guid: 2486d5771d0e5194a84cd8a45b0398fb, type: 3}
   - {fileID: 21300000, guid: 3e5669f3c51e9994ca35b24b83f04d42, type: 3}
-  explosion: {fileID: 4905169246850174971, guid: 7f934b3ce06e0ba40bd3649e6d1ca8de, type: 3}
+  explosion: {fileID: 853972974421797812, guid: b0b3776b01b88c1408493581bf8e37ee, type: 3}
   blockColors:
-  - {r: 0.98823535, g: 0.78823537, b: 0.19607845, a: 1}
-  - {r: 0.16078432, g: 0.67058825, b: 0.9921569, a: 0}
-  - {r: 0.9607844, g: 0.3529412, b: 0.14509805, a: 0}
+  - {r: 1, g: 1, b: 0, a: 1}
+  - {r: 0, g: 0, b: 1, a: 1}
+  - {r: 1, g: 0, b: 0, a: 1}

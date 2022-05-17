@@ -107,6 +107,7 @@ namespace Lulu.Stage
         //리스트에 포함된 블럭의 애니메이션이 끝날때 까지 기다린다.
         public IEnumerator WaitForDropping(List<Block> movingBlocks)
         {
+            
             WaitForSeconds waitForSecond = new WaitForSeconds(0.05f);   //50ms 마다 검사한다.
 
             while(true) //애니메이션 중인 블럭이 없을 때까지 무한루프
@@ -133,6 +134,8 @@ namespace Lulu.Stage
             yield break;
         }
 
+
+
         #region Simple Methods
         //----------------------------------------------------------------------
         // 조회(get/set/is) 메소드
@@ -146,7 +149,7 @@ namespace Lulu.Stage
             // 계산의 편의를 위해서 (0, 0)을 기준으로 좌표를 이동한다. 
             // 8 x 8 보드인 경우: x(-4 ~ +4), y(-4 ~ +4) -> x(0 ~ +8), y(0 ~ +8) 
             Vector2 point = new Vector2(ptOrg.x + (maxCol / 2.0f) , ptOrg.y + (maxRow / 2.0f));
-            Debug.Log("point " + point);
+            //Debug.Log("point " + point);
             if (point.y < 0 || point.x < 0 || point.y > maxRow || point.x > maxCol)
 
                 return false;

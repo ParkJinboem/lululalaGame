@@ -35,6 +35,7 @@ namespace Lulu.Board
 
         BoardEnumerator m_Enumerator;
        
+        
         public Board(int nRow, int nCol)     //생성자, 보드크기 정보를 저장하고 보드 크기만큼 저장할 수 있는 Cell과 Block 배열을 생성
         {
             m_nRow = nRow;
@@ -64,8 +65,6 @@ namespace Lulu.Board
             //3. Cell, Block Prefab을 이용해서 Board에 Cell/Block GameObject를 추가한다.
             float initX = CalcInitX(0.5f);  //row = 0, col = 0에 해당되는 화면 positino을 구한다.
             float initY = CalcInitY(-4.2f);
-            Debug.Log(initX);
-            Debug.Log(initY);
 
             for (int nRow = 0; nRow < m_nRow; nRow++)
                 for (int nCol = 0; nCol < m_nCol; nCol++)
@@ -85,14 +84,12 @@ namespace Lulu.Board
         //퍼즐의 시작 X 위치를 구한다. left - top 좌표
         public float CalcInitX(float offset = 0)
         {
-            Debug.Log(-m_nCol / 2.0f + offset);
             return -m_nCol / 2.0f + offset;
         }
         //퍼즐의 시작 Y 위치, left - bottom 좌표
         //하단이 (0,0) 이므로
         public float CalcInitY(float offset = 0)
         {
-            Debug.Log(-m_nRow / 2.0f + offset);
             return -m_nRow / 2.0f + offset;
         }
 
@@ -159,8 +156,8 @@ namespace Lulu.Board
         //전체 블럭 매칭 상태 업데이트
         public bool UpdateAllBlockMatchedStatus()
         {
-            List<Block> matchedBlockList = new List<Block>();  // 블럭의 개수만큼 생성되는 것을 줄이기 위해 Caller에서 생선한 후에
-                                                        // EvalBlocksIfMatched()의 인자로 전달한다(GC 최소화)
+            List<Block> matchedBlockList = new List<Block>();// 블럭의 개수만큼 생성되는 것을 줄이기 위해 Caller에서 생성한 후에
+                                                             // EvalBlocksIfMatched()의 인자로 전달한다(GC 최소화)
             int nCount = 0;
             for (int nRow = 0; nRow < m_nRow; nRow++)
             {
@@ -273,6 +270,9 @@ namespace Lulu.Board
 
         public IEnumerator ArrangeBlocksAfterClean(List<IntIntKV> unfilledBlocks, List<Block> movingBlocks)
         {
+            Debug.Log("블록이 터진후 0.5초후 블럭이 떨어짐");
+            yield return new WaitForSeconds(0.5f);
+
             SortedList<int, int> emptyBlocks = new SortedList<int, int>();
             List<IntIntKV> emptyRemaingBlocks = new List<IntIntKV>();
 
@@ -342,6 +342,9 @@ namespace Lulu.Board
         //비어있는 블럭을 다시 생성해서 전체 보드를 다시 구성한다.
         public IEnumerator SpawnBlocksAfterClean(List<Block> movingBlocks)
         {
+            Debug.Log("블럭이 생성된후 드랍됨");
+            //yield return new WaitForSeconds(0.1f);  //블럭이 터진후 0.5초후 블럭을 재새성
+
             for (int nCol = 0; nCol < m_nCol; nCol++)   //보드 전체를 탐색해서 처리
             {
                 for (int nRow = 0; nRow < m_nRow; nRow++)
@@ -355,20 +358,20 @@ namespace Lulu.Board
                         for (int y = nTopRow; y < m_nRow; y++)  //현재 행(row)위쪽에 빈블럭을 모두 찾아서 블럭을 생성
                         {
                             if (m_Blocks[y, nCol] != null || !CanBlockBeAllocatable(y, nCol))
-                                continue;
+                                continue;                         
 
                             Block block = SpawnBlockWithDrop(y, nCol, nSpawnBaseY, nCol);   //블럭생성을 요청
                             if (block != null)
                                 movingBlocks.Add(block);    //생성된블럭이 드롭 액션을 수행하기 때문에 movingBlocks 리스트에 저장
 
                             nSpawnBaseY++;  //블럭이 생성되는 기준 위치를 '1'증가
+                   
                         }
-
                         break;
                     }
                 }
             }
-
+            
             yield return null;
         }
 
@@ -379,6 +382,7 @@ namespace Lulu.Board
      */
         Block SpawnBlockWithDrop(int nRow, int nCol, int nSpawnedRow, int nSpawnedCol)
         {
+            
             float fInitX = CalcInitX(Core.Constants.BLOCK_ORG);             //블럭이 Spawn되는 col 기준 원점
             float fInitY = CalcInitY(Core.Constants.BLOCK_ORG) + m_nRow - 4.7f;    //블럭이 Spawn되는 row 기준 원점
 

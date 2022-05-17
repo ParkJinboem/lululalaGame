@@ -38,15 +38,16 @@ namespace Lulu.Util
         //param speed 초당 커지는 속도.예를 들어, 2인 경우 초당 2배 만큼 커지거나 줄어든다. 
         public static IEnumerator Scale(Transform target, float toScale, float speed)
         {
+
             //1. 방향 결정 : 커지는 방향이면 +, 줄어드는 방향이면 -
             bool blnc = target.localScale.x < toScale;
             float fDir = blnc ? 1 : -1;
-
             float factor;
-            while(true)
+
+            while (true)
             {
                 factor = Time.deltaTime * speed * fDir;
-                target.localScale = new Vector3(target.localScale.x + factor, target.localScale.y + target.localScale.z);
+                target.localScale = new Vector3(target.localScale.x + factor, target.localScale.y + factor, target.localScale.z);
 
                 if ((!blnc && target.localScale.x <= toScale) || (blnc && target.localScale.x >= toScale))
                     break;
@@ -55,6 +56,46 @@ namespace Lulu.Util
             }
             yield break;
         }
+
+        //public static IEnumerator Shake(Transform target, float delta, float speed, int count)
+        //{
+
+        //    float currentPosition = target.position.x;
+
+        //    while (true)
+        //    {
+        //        currentPosition += Time.deltaTime * speed;
+
+        //        if (currentPosition >= delta)
+        //        {
+        //            speed *= -1;
+        //            currentPosition = delta;
+        //            count++;
+        //        }
+        //        else if (currentPosition <= -delta)
+        //        {
+        //            speed *= -1;
+        //            currentPosition = -delta;
+        //            count++;
+        //        }
+
+        //        target.Translate(currentPosition, 0, 0);
+        //        //target.position = new Vector3(target.position.x, target.position.y, target.position.z);
+
+        //        //target.localPosition = new Vector3(currentPosition, currentPosition, 0);    //센터에서 대각선으로 흔들림
+        //        //target.localPosition = new Vector3(target.position.x, target.position.y+7, 0);    //위치가 아예바뀜
+        //        //target.scale = new Vector3(target.position.x, currentPosition, 0);
+        //        //Debug.Log("CurrentPosition " + currentPosition);
+
+
+        //        if (count > 10)
+        //        {
+        //            break;
+        //        }
+
+        //        yield return null;
+        //    }
+        //}
 
     }
 

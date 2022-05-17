@@ -10,8 +10,6 @@ namespace Lulu.Stage
         Transform m_Container;          //컨테이너(Board GameObject)
         Stage m_Stage;                  //Stage 객체를 참조
         MonoBehaviour m_MonoBehaviour;  //코루틴 호출시 필요한 MonoBehaviour
-
-
         bool m_bRunning;                //액션 실행 상태 : 실행중인 경우 true
 
         public ActionManager(Transform container, Stage stage)
@@ -22,11 +20,15 @@ namespace Lulu.Stage
             m_MonoBehaviour = container.gameObject.GetComponent<MonoBehaviour>();
         }
 
+        //코루틴 Wapper 메소드
         public Coroutine StartCoroutine(IEnumerator routine)
         {
             return m_MonoBehaviour.StartCoroutine(routine);
         }
 
+        //스와이프 액션을 시작
+        //@param nRow, nCol 블럭 위치
+        //@swipeDir 스와이프 방향
         public void DoSwipeAction(int nRow, int nCol, Swipe swipeDir)
         {
             Debug.Assert(nRow >= 0 && nRow < m_Stage.maxRow && nCol >= 0 && nCol < m_Stage.maxCol);
@@ -37,17 +39,21 @@ namespace Lulu.Stage
             }
         }
 
+
+        //스와이프 액션을 수행하는 코루틴
         IEnumerator CoDoSwipeAction(int nRow, int nCol, Swipe swipeDir)
         {
             if (!m_bRunning)     //다른 액션이 수행 중이면 PASS
             {
-                m_bRunning = true;
+                m_bRunning = true;  //액션 실행 상태 ON
 
                 SoundManager.instance.PlayOneShot(Clip.Chomp);
 
                 //1. swipe action 수행
-                Returnable<bool> bSwipedBlock = new Returnable<bool>(false);    //EvaluateBoard() Enumerator 호출 결과를 수신받을 Returnable<bool> 객체를 생성한다.
-                                                                                // 실형결과 bool값을 리턴받으며 3매칭 블럭이 발견되는 경우 true, 없는경우 false값을 가진다    
+                Returnable<bool> bSwipedBlock = new Returnable<bool>(false);    //EvaluateBoard() Enumerator 호출 결과를
+                                                                                //수신받을 Returnable<bool> 객체를 생성한다.
+                                                                                // 실형결과 bool값을 리턴받으며 3매칭 블럭이 발견되는 경우 true,
+                                                                                // 없는경우 false값을 가진다    
                 yield return m_Stage.CoDoSwipeAction(nRow, nCol, swipeDir, bSwipedBlock);
 
                 //2. 스와이프 성공한 경우 보드를 평가(매치블럭삭제, 빈블럭 드롭, 새블럭 Spawn등)한다.

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using Lulu.Util;
 
 namespace Lulu.Stage 
@@ -21,12 +22,46 @@ namespace Lulu.Stage
         [SerializeField] GameObject m_CellPrefab;
         [SerializeField] GameObject m_BlockPrefab;
 
-        void Start()    
+
+
+        public Text GameSpeed;
+        float gameSpeed;
+        public void GameSpeedPlus()
         {
+           
+
+            Time.timeScale += 0.1f;
+        }
+        public void GameSppedMinus()
+        {
+         
+            Time.timeScale -= 0.1f;
+        }
+
+
+
+
+
+
+        void Start()
+        { 
             InitStage();    //씬이 시작되면 초기화 함수를 호출
+            Screen.orientation = ScreenOrientation.Portrait;
         }
         private void Update()
         {
+            gameSpeed = Time.timeScale;
+            GameSpeed.text = gameSpeed.ToString();
+
+            if (Time.timeScale < 0.1f)
+            {
+                Time.timeScale = 0.0f;
+            }
+
+            if (Time.timeScale >= 5.0f)
+            {
+                Time.timeScale = 5.0f;
+            }
             if (!m_bInit)
                 return;
 
@@ -57,7 +92,6 @@ namespace Lulu.Stage
             m_Stage.ComposeStage(m_CellPrefab, m_BlockPrefab, m_Container);
         }
 
-
         void OnInputHandler()
         {
             //Touch Down
@@ -65,7 +99,7 @@ namespace Lulu.Stage
             {
                 //1.1 보드 기준 Local 좌표를 구한다.
                 Vector2 point = m_InputManager.touch2BoardPosition;
-                Debug.Log($"Input Down= {point}, local = {m_InputManager.touch2BoardPosition}");
+                //Debug.Log($"Input Down= {point}, local = {m_InputManager.touch2BoardPosition}");
 
                 //1.2 Play 영역(보드)에서 클릭하지 않는 경우는 무시
                 if (!m_Stage.IsInsideBoard(point))

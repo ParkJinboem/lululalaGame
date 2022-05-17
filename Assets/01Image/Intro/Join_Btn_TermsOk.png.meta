@@ -36,6 +36,7 @@ TextureImporter:
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
+  ignoreMasterTextureLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -208,6 +209,11 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
+    nameFileIdTable:
+      Join_Btn_TermsOk_2: 1723648098186889100
+      Join_Btn_TermsOk_1: -5156739774820616573
+      Join_Btn_TermsOk_0: -7847878067888585591
+      Join_Btn_TermsOk_3: 5211683893115712524
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0
